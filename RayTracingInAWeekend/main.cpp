@@ -160,7 +160,7 @@ int main(int argc, const char * argv[]) {
         PixelRGBA grad[nx * ny];
         RGGradientInto(grad);
         unsigned char *data = (unsigned char *)grad;
-        stbi_write_bmp("../out_image_grad.bmp", outImageWidth, outImageHeight, 4, data);
+        stbi_write_bmp("out_image_grad.bmp", outImageWidth, outImageHeight, 4, data);
     }
     
     {
@@ -212,7 +212,7 @@ int main(int argc, const char * argv[]) {
         PixelRGBA col[nx * ny];
         traceInto(col);
         unsigned char *data = (unsigned char *)col;
-        stbi_write_bmp("../out_image.bmp", outImageWidth, outImageHeight, 4, data);
+        stbi_write_bmp("out_image.bmp", outImageWidth, outImageHeight, 4, data);
     }
     
     return 0;

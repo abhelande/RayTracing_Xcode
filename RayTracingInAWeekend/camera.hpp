@@ -9,6 +9,8 @@
 #ifndef camera_h
 #define camera_h
 
+#include "ray.hpp"
+
 class camera
 {
 public:
