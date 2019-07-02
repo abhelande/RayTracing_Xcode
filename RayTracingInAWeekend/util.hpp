@@ -2,7 +2,7 @@
 //  util.hpp
 //  RayTracingInAWeekend
 //
-//  Created by Abhijit Bhelande on 7/1/19.
+//  Created by Abhijit Bhelande on 6/25/19.
 //  Copyright © 2019 Abhijit Bhelande. All rights reserved.
 //
 
@@ -11,7 +11,10 @@
 
 #include "vec3.hpp"
 
-#define PI 3.14159265
+inline float degToRad(float degrees)
+{
+    return degrees * (M_PI / 180.0f);
+}
 
 float schlick(float cosine, float ref_idx) {
     float r0 = (1-ref_idx) / (1+ref_idx);

@@ -2,7 +2,7 @@
 //  hitable_list.hpp
 //  RayTracingInAWeekend
 //
-//  Created by Abhijit Bhelande on 6/19/19.
+//  Created by Abhijit Bhelande on 6/25/19.
 //  Copyright © 2019 Abhijit Bhelande. All rights reserved.
 //
 

@@ -2,7 +2,7 @@
 //  main.cpp
 //  RayTracingInAWeekend
 //
-//  Created by Abhijit Bhelande on 5/19/18.
+//  Created by Abhijit Bhelande on 6/25/19.
 //  Copyright © 2018 Abhijit Bhelande. All rights reserved.
 //
 
@@ -24,24 +24,42 @@
 
 #define MAX_BOUNCES 50
 
+constexpr char outputFormat[] = ".bmp";
+// simple 4 tupule struct to represent pixel of final image plane
+// RGBA channel ordering
 class PixelRGBA {
 public:
     uint8_t r, g, b, a;
     
     PixelRGBA(uint8_t r, uint8_t g, uint8_t b, uint8_t a) : r(r), g(g), b(b), a(a) {}
     PixelRGBA() { PixelRGBA(0, 0, 0, 0); }
+    static int getNumComponents() { return 4; }
 };
 
-const int outImageWidth = 200;
-const int outImageHeight = 100;
+// A snapshot is simply an image of the world taken from a certain angle
+// Also a label to identify the shot
+class snapshot {
+public:
+    camera cam;
+    std::string label;
+    
+    snapshot() = delete;
+    snapshot(camera c,
+             const char* id) :  cam(c),
+                                label(id) {}
+};
 
-const vec3 lowerLeft(-2.0f, -1.0f, -1.0f);
-const vec3 horizontal(4.0f, 0.0f, 0.0f);
-const vec3 vertical(0.0f, 2.0f, 0.0f);
-const vec3 origin(0.0f, 0.0f, 0.0f);
+// Global image parameters
+const int outImageWidth = 400;
+const int outImageHeight = 200;
+const float aspect = (float)outImageWidth / (float)outImageHeight;
 
 hitable_list world;
 
+// Debug:
+// Render a gradient - this is just to get a sense of orientation
+// of the image format and type
+// This will tell you if image orientation is top left or bottome left.
 void RGGradientInto(PixelRGBA *col)
 {
     for (int j = outImageHeight - 1; j >= 0; j--) {
@@ -59,40 +77,15 @@ void RGGradientInto(PixelRGBA *col)
     }
 }
 
-vec3 gradColorAtRay(const ray& r)
-{
-    // This is same as RGGradient above - but through ray pixel
-    // determination
-    vec3 unitDir = r.direction();
-    float xGrad = (unitDir.x() + (horizontal.x() / 2.0f)) / horizontal.x();
-    float yGrad = (unitDir.y() + (vertical.y() / 2.0f)) / vertical.y();
-    
-    return vec3(xGrad, yGrad, 0.0f);
-}
-
+// Background color
+// If ray hits infinity without hitting any object, return this
+// background is a light blue gradient
 vec3 bgColorAtRay(const ray& r)
 {
     // This returns lerped blue fade
     vec3 unitDir = unit_vector(r.direction());
     float t = 0.5f * (unitDir.y() + 1.0f);
     return (1.0f - t) * vec3(1.0f, 1.0f, 1.0f) + t * vec3(0.5f, 0.7f, 1.0f);
-}
-
-bool hit_sphere(const vec3& center, float radius, const ray& r, hit_record &hr)
-{
-    vec3 oc = r.origin() - center;
-    float a = dot(r.direction(), r.direction());
-    float b = 2.0f * dot(oc, r.direction());
-    float c = dot(oc, oc) - radius * radius;
-    
-    float discriminant = b * b - 4.0f * a * c;
-    if (discriminant < 0) {
-        return false;
-    } else {
-        float t = (-b - sqrt(discriminant)) / (2.0f * a);
-        hr.p = r.point_at_parameter(t);
-        return true;
-    }
 }
 
 vec3 colorAtRay(const ray& r, hitable_list& world, int bounceDepth)
@@ -113,9 +106,10 @@ vec3 colorAtRay(const ray& r, hitable_list& world, int bounceDepth)
     return bgColorAtRay(r);
 }
 
-void traceInto(PixelRGBA *rgbaTarget)
+void traceInto(PixelRGBA *rgbaTarget, camera &cam)
 {
-    camera cam;
+    // use std uniform random distribution to generate
+    // ray offsets. Not the best option, but it's a start
     std::default_random_engine gen;
     std::uniform_real_distribution<float> distr;
 
@@ -133,7 +127,8 @@ void traceInto(PixelRGBA *rgbaTarget)
 
             col /= float(numSamples);
             // gamma correction
-            col = vec3( sqrt(col[0]), sqrt(col[1]), sqrt(col[2]) );
+            constexpr float gamma = 1.0f / 2.2f;
+            col = vec3(pow(col[0], gamma), pow(col[1], gamma), pow(col[2], gamma));
             int ir = int(255.99*col[0]);
             int ig = int(255.99*col[1]);
             int ib = int(255.99*col[2]);
@@ -154,8 +149,9 @@ int main(int argc, const char * argv[]) {
     int ny = outImageHeight;
 
     {
+        // Debug:
         // Render a gradient - this is just to get a sense of orientation
-        // of the iamge format and type
+        // of the image format and type
         // This will tell you if image orientation is top left or bottome left.
         PixelRGBA grad[nx * ny];
         RGGradientInto(grad);
@@ -210,9 +206,20 @@ int main(int argc, const char * argv[]) {
         
         // trace
         PixelRGBA col[nx * ny];
-        traceInto(col);
-        unsigned char *data = (unsigned char *)col;
-        stbi_write_bmp("out_image.bmp", outImageWidth, outImageHeight, 4, data);
+        // Each snapshot corresponds to some camera view of the world / scene
+        std::vector<snapshot> snapshots = {
+            snapshot(camera(55.0f, aspect), "RayTrace_Image_1")
+        };
+        
+        // generate above snapshots of the scene
+        for (snapshot& snap : snapshots) {
+            traceInto(col, snap.cam);
+            unsigned char *data = (unsigned char *)col;
+            stbi_write_bmp(snap.label.append(outputFormat).c_str(),
+                           outImageWidth, outImageHeight,
+                           PixelRGBA::getNumComponents(),
+                           data);
+        }
     }
     
     return 0;

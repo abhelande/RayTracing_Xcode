@@ -2,7 +2,7 @@
 //  ray.hpp
 //  RayTracingInAWeekend
 //
-//  Created by Abhijit Bhelande on 8/19/18.
+//  Created by Abhijit Bhelande on 6/25/19.
 //  Copyright © 2018 Abhijit Bhelande. All rights reserved.
 //
 

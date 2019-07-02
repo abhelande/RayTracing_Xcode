@@ -2,7 +2,7 @@
 //  sphere.h
 //  RayTracingInAWeekend
 //
-//  Created by Abhijit Bhelande on 6/15/19.
+//  Created by Abhijit Bhelande on 6/25/19.
 //  Copyright © 2019 Abhijit Bhelande. All rights reserved.
 //
 
@@ -54,7 +54,7 @@ public:
                 // divide by (2 x PI) to convert the returned angle to [-0.5, 0.5] range
                 // N.y = v
                 // 0.5 add to shift to [0,1] range
-                rec.u = atan2(rec.normal.x(), rec.normal.z()) / (2 * PI) + 0.5f;
+                rec.u = atan2(rec.normal.x(), rec.normal.z()) / (2 * M_PI) + 0.5f;
                 rec.v = rec.normal.y() * 0.5f + 0.5f;
                 return true;
             }
