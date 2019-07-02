@@ -208,9 +208,9 @@ int main(int argc, const char * argv[]) {
         PixelRGBA col[nx * ny];
         // Each snapshot corresponds to some camera view of the world / scene
         std::vector<snapshot> snapshots = {
-//            snapshot(camera(50.0f,
-//                            aspect),
-//                     "RayTrace_Image_1"),
+            snapshot(camera(50.0f,
+                            aspect),
+                     "RayTrace_Image_1"),
             
             snapshot(camera(15.0f,
                             aspect,
