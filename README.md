@@ -18,6 +18,7 @@ _Based on_:
 * You should see outputs generated at:
 	* _\<checkout\_path\>/bin/RayTrace\_Image\_1.bmp_
 	* _\<checkout\_path\>/bin/RayTrace\_Image\_2.bmp_
+	* _\<checkout\_path\>/bin/RayTrace\_Image\_3.bmp_
 
 ### Xcode
 * cd \<checkout\_path\>
@@ -25,13 +26,15 @@ _Based on_:
 * You should see outputs generated at _DerivedData⁩ ▸ ⁨RayTracingInAWeekend⁩ ▸ ⁨Build⁩ ▸ ⁨Products⁩ ▸ ⁨Debug / Release_
 	* _RayTrace\_Image\_1.bmp_
 	* _RayTrace\_Image\_2.bmp_ 
+	* _RayTrace\_Image\_3.bmp_ 
 ⁩
 
 ## Output
-Expected output can be observed in _\<checkout\_path\>/img_ folders
+Expected image output can be observed in _\<checkout\_path\>/img_ folder
 
 ![RayTrace_Image_1](img/RayTrace_Image_1.bmp)
 ![RayTrace_Image_1](img/RayTrace_Image_2.bmp)
+![RayTrace_Image_1](img/RayTrace_Image_3.bmp)
 
 
 ## Other References:
