@@ -33,7 +33,7 @@ public:
                               surfaceMat(mat)
     {}
     
-    bool hit(const ray& r, float t_min, float t_max, hit_record& rec) const
+    bool hit(const ray& r, float t_min, float t_max, intersectParams& rec) const
     {
         const vec3 e1 = vtx1 - vtx0;
         const vec3 e2 = vtx2 - vtx0;

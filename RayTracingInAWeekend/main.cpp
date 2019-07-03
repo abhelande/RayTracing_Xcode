@@ -21,6 +21,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
+#define OUTPUT_DEBUG_GRADIENT 0
 #define MAX_BOUNCES 50
 
 constexpr char outputFormat[] = ".bmp";
@@ -89,7 +90,7 @@ vec3 bgColorAtRay(const ray& r)
 
 vec3 colorAtRay(const ray& r, hitable_list& world, int bounceDepth)
 {
-    hit_record rec;
+    intersectParams rec;
     if (world.hit(r, 0.0001f, MAXFLOAT, rec)) {
         ray scattered;
         vec3 attenuation;
@@ -147,6 +148,7 @@ int main(int argc, const char * argv[]) {
     int nx = outImageWidth;
     int ny = outImageHeight;
 
+#if OUTPUT_DEBUG_GRADIENT
     {
         // Debug:
         // Render a gradient - this is just to get a sense of orientation
@@ -157,6 +159,7 @@ int main(int argc, const char * argv[]) {
         unsigned char *data = (unsigned char *)grad;
         stbi_write_bmp("out_image_grad.bmp", outImageWidth, outImageHeight, 4, data);
     }
+#endif
     
     {
         // for random colors

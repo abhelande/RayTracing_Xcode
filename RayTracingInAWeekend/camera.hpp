@@ -57,8 +57,11 @@ public:
     // return ray object given a u,v scan coord across the projection plane
     // u,v are normalized to [0, 1] and must be scaled by plane dimensions
     // for offset from origin
-    ray getRayAt(float u, float v) {
-        return ray(origin, unit_vector((lowerLeft - origin) + u * horizontal + v * vertical));
+    ray getRayAt(float u,
+                 float v)
+    {
+        return ray(origin,
+                   unit_vector((lowerLeft - origin) + u * horizontal + v * vertical));
     }
     
     vec3 lowerLeft;

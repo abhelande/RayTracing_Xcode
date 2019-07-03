@@ -11,18 +11,26 @@
 
 #include "vec3.hpp"
 
+// Ray object
+// Represented by its parametric form:
+// O + t * D
+// O: ray origin
+// D: ray direction
+//
 class ray {
 public:
     vec3 A; // origin
     vec3 B; // direction
     
     ray() : A(vec3()), B(vec3()) {}
-    ray(const vec3 &origin, const vec3 &dir) { A = origin; B = dir; }
+    ray(const vec3 &origin,
+        const vec3 &dir) : A(origin),
+                           B(dir) {}
     
     inline vec3 origin() const { return A; }
     inline vec3 direction() const { return B; }
     
-    vec3 point_at_parameter(float t) const {
+    inline vec3 point_at_parameter(float t) const {
         return (A + t * B);
     }
 };

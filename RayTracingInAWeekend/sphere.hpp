@@ -23,7 +23,10 @@ public:
                             radius(rad),
                             surfaceMat(mat) {}
     
-    bool hit(const ray& r, float t_min, float t_max, hit_record& rec) const
+    bool hit(const ray& r,
+             float t_min,
+             float t_max,
+             intersectParams& rec) const
     {
         // For sphere whose center is located at C (<Cx, Cy, Cz>) with Radius R (scalar),
         // Eqn for point P (<Px, Py, Pz>) on the spheres surface,
