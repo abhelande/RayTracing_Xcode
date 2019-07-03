@@ -155,6 +155,47 @@ void traceInto(PixelRGBA *rgbaTarget,
     }
 }
 
+// Create scene data
+void generateScene(scene &world)
+{
+    // hovering triangle
+    world.objects.emplace_back(new triangle(vec3(-3.0f, 0.0f, -3.0f),
+                                            vec3( 3.0f, 1.0f, -2.0f),
+                                            vec3(-2.0f, 2.0f, -1.5f),
+                                            new metal(vec3(0.8, 0.1, 0.5))));
+    // center metaalic sphere
+    world.objects.emplace_back(new sphere(vec3(0.0f, 0.0f, -1.0f),
+                                          0.5f,
+                                          new metal(vec3(0.1, 0.2, 0.5))));
+    // left refracting sphere
+    world.objects.emplace_back(new sphere(vec3(-1.0f, 0.0f, -1.0f),
+                                          0.5f,
+                                          new dielectric(1.5)));
+    // right back fuzzy metallic silver
+    world.objects.emplace_back(new sphere(vec3(1.0f, 0.0f, -2.0f),
+                                          0.5f,
+                                          new lambertian(vec3(0.8, 0.8, 0.8))));
+    {
+        // checkerboard hovering sphere
+        flatShade* shade0 = new flatShade(vec3(0.9, 0.5, 0.0f));
+        flatShade* shade1 = new flatShade(vec3(0.9, 0.9, 0.9));
+        checkerBoard* checkTex = new checkerBoard(shade0, shade1);
+        world.objects.emplace_back(new sphere(vec3(3.0f, 2.0f, -3.0f),
+                                              1.5f,
+                                              new lambertianTexture(checkTex)));
+    }
+    
+    // Green white patterned base
+    {
+        flatShade* shade0 = new flatShade(vec3(0.2, 0.3, 0.1));
+        flatShade* shade1 = new flatShade(vec3(0.9, 0.9, 0.9));
+        checkerBoard* checkTex = new checkerBoard(shade0, shade1);
+        world.objects.emplace_back(new sphere(vec3(0.0f, -100.5f, -1.0f),
+                                              100.0f,
+                                              new lambertianTexture(checkTex)));
+    }
+}
+
 int main(int argc, const char * argv[]) {
     
     int nx = outImageWidth;
@@ -174,46 +215,9 @@ int main(int argc, const char * argv[]) {
 #endif
     
     {
-        // for random colors
-        std::default_random_engine gen;
-        std::uniform_real_distribution<float> distr;
-        
         // create world
         scene world;
-        world.objects.emplace_back(new triangle(vec3(-3.0f, 0.0f, -3.0f),
-                                                vec3( 3.0f, 1.0f, -2.0f),
-                                                vec3(-2.0f, 2.0f, -1.5f),
-                                                new metal(vec3(0.7, 0.1, 0.3))));
-        world.objects.emplace_back(new sphere(vec3(0.0f, 0.0f, -1.0f),
-                                              0.5f,
-                                              new metal(vec3(0.1, 0.2, 0.5))));
-        world.objects.emplace_back(new sphere(vec3(-1.0f, 0.0f, -1.0f),
-                                              0.5f,
-                                              new dielectric(1.5)));
-        world.objects.emplace_back(new sphere(vec3(1.0f, 0.0f, -2.0f),
-                                              0.5f,
-                                              new lambertian(vec3(distr(gen), 0.0, distr(gen)))));
-        {
-            // checkerboard sphere 1
-            flatShade* shade0 = new flatShade(vec3(distr(gen), 0.1f, distr(gen)));
-            flatShade* shade1 = new flatShade(vec3(0.9, 0.9, distr(gen)));
-            checkerBoard* checkTex = new checkerBoard(shade0, shade1);
-            
-            world.objects.emplace_back(new sphere(vec3(3.0f, 2.0f, -3.0f),
-                                                  1.5f,
-                                                  new lambertianTexture(checkTex)));
-        }
-        
-        // Green white patterned base
-        {
-            flatShade* shade0 = new flatShade(vec3(0.2, 0.3, 0.1));
-            flatShade* shade1 = new flatShade(vec3(0.9, 0.9, 0.9));
-            checkerBoard* checkTex = new checkerBoard(shade0, shade1);
-            
-            world.objects.emplace_back(new sphere(vec3(0.0f, -100.5f, -1.0f),
-                                                  100.0f,
-                                                  new lambertianTexture(checkTex)));
-        }
+        generateScene(world);
         
         // trace
         PixelRGBA col[nx * ny];
