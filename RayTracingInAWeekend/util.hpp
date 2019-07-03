@@ -79,5 +79,41 @@ vec3 unitSphereRandomRadVec()
     return rdm;
 }
 
+bool getQuadraticRoots(float a,
+                       float b,
+                       float c,
+                       float &root0,
+                       float &root1)
+{
+    float discriminant = b * b - 4 * a * c;
+    if (discriminant < 0.0f) {
+        return false;
+    }
+    
+    if (discriminant == 0) {
+        root0 = root1 = - 0.5 * b / a;
+    } else {
+        // when b and the root of the discriminant are nearly equal
+        // we may have precision losses.
+        // so formulate this as:
+        // q = -1/2 * (b + sign(b) * sqrt(discriminant))
+        // where sign(b) is '-'ve for b < 0 only
+        // mainly anything added to q is now the same sign
+        // root0 = q / a
+        // root1 = c / q
+        //
+        float q = (b > 0.0f) ? -0.5f * (b + sqrt(discriminant)) :
+                               -0.5f * (b - sqrt(discriminant));
+        root0 = q / a;
+        root1 = c / q;
+        
+        if (root0 > root1) {
+            std::swap(root0, root1);
+        }
+    }
+    
+    return true;
+}
+
 
 #endif /* util_h */

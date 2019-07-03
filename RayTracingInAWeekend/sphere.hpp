@@ -13,6 +13,12 @@
 #include "material.hpp"
 #include <cmath>
 
+// The math in the book seems off (even though output is similar) ??
+// Im guessing hes taken advantage of the fact that a in the quadratic
+// to solve is 1 for unit ray direction
+// so disabling
+#define SHIRLEY_ROOTS 0
+
 class sphere : public hitable
 {
 public:
@@ -36,7 +42,7 @@ public:
         // Substitute P = Ray eqn = O + t*D
         // you get quadratic form: a*x^2 + b*x + c = 0
         // a = |D|^2
-        // b = (O - C).(D)
+        // b = 2 *(O - C).(D)
         // c = |(O - C)|^2 - R^2
         //
         // solving this,
@@ -46,8 +52,11 @@ public:
         float a = dot(r.direction(), r.direction());
         float b = dot(oc, r.direction());
         float c = dot(oc, oc) - radius * radius;
-        float discriminant = b * b - a * c;
         
+        float root = 0.0f;
+        bool didHit = false;
+#if SHIRLEY_ROOTS
+        float discriminant = b * b - a * c;
         if (discriminant > 0) {
             bool didHit = false;
             float root = 0.0f;
@@ -67,23 +76,35 @@ public:
                     didHit = (root < t_max && root > t_min);
                 }
             }
-            
-            if (didHit) {
-                rec.t = root;
-                // root is used to find point of intersection
-                rec.p = r.point_at_parameter(root);
-                // normal is simply outwards from center to that point
-                rec.normal = (rec.p - center) / radius;
-                rec.surfaceMat = surfaceMat;
-                
-                // uv calc (cylindrical coords)
-                // divide by (2 x PI) to convert the returned angle to [-0.5, 0.5] range
-                // N.y = v
-                // 0.5 add to shift to [0,1] range
-                rec.u = atan2(rec.normal.x(), rec.normal.z()) / (2 * M_PI) + 0.5f;
-                rec.v = rec.normal.y() * 0.5f + 0.5f;
-                return true;
+        }
+#else
+        b *= 2.0f;
+        float t0, t1;
+        if (getQuadraticRoots(a, b, c, t0, t1)) {
+            if (t0 < t_max && t0 > t_min) {
+                root = t0;
+                didHit = true;
+            } else if (t1 < t_max && t1 > t_min) {
+                root = t1;
+                didHit = true;
             }
+        }
+#endif
+        
+        if (didHit) {
+            rec.t = root;
+            // root is used to find point of intersection
+            rec.p = r.point_at_parameter(root);
+            // normal is simply outwards from center to that point
+            rec.normal = (rec.p - center) / radius;
+            rec.surfaceMat = surfaceMat;
+            // uv calc (cylindrical coords)
+            // divide by (2 x PI) to convert the returned angle to [-0.5, 0.5] range
+            // N.y = v
+            // 0.5 add to shift to [0,1] range
+            rec.u = atan2(rec.normal.x(), rec.normal.z()) / (2 * M_PI) + 0.5f;
+            rec.v = rec.normal.y() * 0.5f + 0.5f;
+            return true;
         }
         
         return false;

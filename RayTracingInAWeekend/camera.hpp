@@ -10,6 +10,7 @@
 #define camera_h
 
 #include "ray.hpp"
+#include "util.hpp"
 
 class camera
 {
@@ -61,7 +62,7 @@ public:
                  float v)
     {
         return ray(origin,
-                   unit_vector((lowerLeft - origin) + u * horizontal + v * vertical));
+                   ((lowerLeft - origin) + u * horizontal + v * vertical));
     }
     
     vec3 lowerLeft;
