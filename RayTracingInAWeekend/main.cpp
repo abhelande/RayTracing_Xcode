@@ -22,9 +22,10 @@
 #include "stb_image.h"
 
 #define OUTPUT_DEBUG_GRADIENT 0
-#define MAX_BOUNCES 50
-
+constexpr uint32_t maxBounces = 50;
+constexpr uint32_t nPixelSamples = 200;
 constexpr char outputFormat[] = ".bmp";
+
 // simple 4 tupule struct to represent pixel of final image plane
 // RGBA channel ordering
 class PixelRGBA {
@@ -53,8 +54,6 @@ public:
 const int outImageWidth = 400;
 const int outImageHeight = 200;
 const float aspect = (float)outImageWidth / (float)outImageHeight;
-
-hitable_list world;
 
 // Debug:
 // Render a gradient - this is just to get a sense of orientation
@@ -88,13 +87,21 @@ vec3 bgColorAtRay(const ray& r)
     return (1.0f - t) * vec3(1.0f, 1.0f, 1.0f) + t * vec3(0.5f, 0.7f, 1.0f);
 }
 
-vec3 colorAtRay(const ray& r, hitable_list& world, int bounceDepth)
+// Return color at Ray
+// for each intersection, gather color for material at point of intersection
+// and any subsequent refelected / refracted attenuated ray
+// Do this no more than bounceDepth times per ray
+//
+// If it hits nothing - return bg color
+vec3 colorAtRay(const ray& r,
+                hitable_list& world,
+                uint32_t bounceDepth)
 {
     intersectParams rec;
     if (world.hit(r, 0.0001f, MAXFLOAT, rec)) {
         ray scattered;
         vec3 attenuation;
-        if (bounceDepth < MAX_BOUNCES &&
+        if (bounceDepth < maxBounces &&
             rec.surfaceMat->scatter(r, rec, attenuation, scattered)) {
             return attenuation * colorAtRay(scattered, world, bounceDepth + 1);
         } else {
@@ -106,7 +113,13 @@ vec3 colorAtRay(const ray& r, hitable_list& world, int bounceDepth)
     return bgColorAtRay(r);
 }
 
-void traceInto(PixelRGBA *rgbaTarget, camera &cam)
+// For a given camera / scene - do ray trace
+// and gsther collected samples into RGBA destination buffer
+// Fires 'nPixelSamples' offset randomly per pixel.
+// and applies gamma correction
+void traceInto(PixelRGBA *rgbaTarget,
+               hitable_list& world,
+               camera& cam)
 {
     // use std uniform random distribution to generate
     // ray offsets. Not the best option, but it's a start
@@ -115,23 +128,22 @@ void traceInto(PixelRGBA *rgbaTarget, camera &cam)
 
     for (int j = outImageHeight - 1; j >= 0; j--) {
         for (int i = 0; i < outImageWidth; i++) {
-            
-            int numSamples = 100;
-            vec3 col(0, 0, 0);
-            for (int s=0; s < numSamples; s++) {
+            vec3 gather(0, 0, 0);
+            for (uint32_t s = 0; s < nPixelSamples; s++) {
                 float u = (float(i) + distr(gen)) / float(outImageWidth);
                 float v = (float(j) + distr(gen)) / float(outImageHeight);
                 ray r = cam.getRayAt(u, v);
-                col += colorAtRay(r, world, 0);
+                gather += colorAtRay(r, world, 0);
             }
 
-            col /= float(numSamples);
+            vec3 col = gather / float(nPixelSamples);
             // gamma correction
             constexpr float gamma = 1.0f / 2.2f;
             col = vec3(pow(col[0], gamma), pow(col[1], gamma), pow(col[2], gamma));
-            int ir = int(255.99*col[0]);
-            int ig = int(255.99*col[1]);
-            int ib = int(255.99*col[2]);
+            // convert [0, 1] -> [0, 255] ranges for rgb
+            int ir = int(255.99f * col[0]);
+            int ig = int(255.99f * col[1]);
+            int ib = int(255.99f * col[2]);
             
             // write to image target;
             PixelRGBA *p = &rgbaTarget[(outImageHeight - j - 1) * outImageWidth + i];
@@ -167,6 +179,7 @@ int main(int argc, const char * argv[]) {
         std::uniform_real_distribution<float> distr;
         
         // create world
+        hitable_list world;
         world.objects.emplace_back(new triangle(vec3(-3.0f, 0.0f, -3.0f),
                                                 vec3( 3.0f, 1.0f, -2.0f),
                                                 vec3(-2.0f, 2.0f, -1.5f),
@@ -220,7 +233,7 @@ int main(int argc, const char * argv[]) {
         
         // generate above snapshots of the scene
         for (snapshot& snap : snapshots) {
-            traceInto(col, snap.cam);
+            traceInto(col, world, snap.cam);
             unsigned char *data = (unsigned char *)col;
             stbi_write_bmp(snap.label.append(outputFormat).c_str(),
                            outImageWidth, outImageHeight,
