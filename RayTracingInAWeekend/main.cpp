@@ -9,6 +9,7 @@
 #include <iostream>
 #include <fstream>
 #include <random>
+#include <chrono>
 #include "hitable_list.hpp"
 #include "ray.hpp"
 #include "sphere.hpp"
@@ -238,14 +239,21 @@ int main(int argc, const char * argv[]) {
         };
         
         // generate above snapshots of the scene
-        fprintf(stderr, "\nTracing into %u x %u images, w %u samples per pixel.",
+        fprintf(stderr, "\nTracing into %u x %u images, with %u samples per pixel.",
                                 outImageWidth, outImageHeight, nPixelSamples);
         for (snapshot& snap : snapshots) {
+            // trace scene and measure time to do so
             fprintf(stderr, "\n\nGenerating scene %s ... ", snap.label.c_str());
+            auto start = std::chrono::steady_clock::now();
             traceInto(col, world, snap.cam);
+            auto end = std::chrono::steady_clock::now();
             fprintf(stderr, "Done.");
-            unsigned char *data = (unsigned char *)col;
+            fprintf(stderr, "\nTime to Trace = %lld milliseconds",
+                    std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count());
+            
+            // write into image
             fprintf(stderr, "\nOutputting image ... ");
+            unsigned char *data = (unsigned char *)col;
             stbi_write_bmp(snap.label.append(outputFormat).c_str(),
                            outImageWidth, outImageHeight,
                            PixelRGBA::getNumComponents(),
