@@ -48,6 +48,7 @@ public:
 class lambertian : public material
 {
 public:
+    lambertian() = delete;
     lambertian(const vec3& a) : albedo(a) {}
     
     virtual bool scatter(const ray& ray_in,
@@ -72,6 +73,7 @@ public:
 class lambertianTexture : public material
 {
 public:
+    lambertianTexture() = delete;
     lambertianTexture(texture* a) : albedo(a) {}
     
     virtual bool scatter(const ray& ray_in, const intersectParams& rec, vec3& attenuation, ray& scattered) const
@@ -95,7 +97,11 @@ public:
 class metal : public material
 {
 public:
-    metal(const vec3& a) : albedo(a) {}
+    metal() = delete;
+    metal(const vec3& a, float fuzz) : albedo(a),
+                                       fuzziness(std::max(fuzz, 1.0f)) {}
+    metal(const vec3& a): albedo(a),
+                          fuzziness(0.0f) {}
     
     virtual bool scatter(const ray& ray_in,
                          const intersectParams& rec,
@@ -103,12 +109,13 @@ public:
                          ray& scattered) const
     {
         const vec3 reflectedRay = reflect(unit_vector(ray_in.direction()), rec.normal);
-        scattered = ray(rec.p, reflectedRay);
+        scattered = ray(rec.p, reflectedRay + fuzziness * unitSphereRandomRadVec());
         attenuation = albedo;
         return (dot(scattered.direction(), rec.normal) > 0);
     }
     
     vec3 albedo;
+    float fuzziness;
 };
 
 // Dielectrics partly reflect + refract (transmit) the incident

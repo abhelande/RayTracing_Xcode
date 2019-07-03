@@ -163,7 +163,7 @@ void generateScene(scene &world)
                                             vec3( 3.0f, 1.0f, -2.0f),
                                             vec3(-2.0f, 2.0f, -1.5f),
                                             new metal(vec3(0.8, 0.1, 0.5))));
-    // center metaalic sphere
+    // center metallic sphere
     world.objects.emplace_back(new sphere(vec3(0.0f, 0.0f, -1.0f),
                                           0.5f,
                                           new metal(vec3(0.1, 0.2, 0.5))));
@@ -171,10 +171,10 @@ void generateScene(scene &world)
     world.objects.emplace_back(new sphere(vec3(-1.0f, 0.0f, -1.0f),
                                           0.5f,
                                           new dielectric(1.5)));
-    // right back fuzzy metallic silver
+    // right back fuzzy metal
     world.objects.emplace_back(new sphere(vec3(1.0f, 0.0f, -2.0f),
-                                          0.5f,
-                                          new lambertian(vec3(0.8, 0.8, 0.8))));
+                                          0.6f,
+                                          new metal(vec3(0.8, 0.8, 0.8), 0.9f)));
     {
         // checkerboard hovering sphere
         flatShade* shade0 = new flatShade(vec3(0.9, 0.5, 0.0f));
@@ -217,7 +217,9 @@ int main(int argc, const char * argv[]) {
     {
         // create world
         scene world;
+        fprintf(stderr, "\n\nGenerating world data ... ");
         generateScene(world);
+        fprintf(stderr, "Done.");
         
         // trace
         PixelRGBA col[nx * ny];
