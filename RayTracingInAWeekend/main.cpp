@@ -106,7 +106,7 @@ vec3 colorAtRay(const ray& r,
             rec.surfaceMat->scatter(r, rec, attenuation, scattered)) {
             return attenuation * colorAtRay(scattered, world, bounceDepth + 1);
         } else {
-            // shadow color
+            // exceeds max bounce
             return vec3(0.0f);
         }
     }
@@ -229,13 +229,24 @@ int main(int argc, const char * argv[]) {
             snapshot(camera(50.0f,
                             aspect),
                      "RayTrace_Image_1"),
-            
+
             snapshot(camera(15.0f,
                             aspect,
                             vec3(5.0f, 1.0f, 3.0f), // from
-                            vec3(0.0f, 1.0f, -1.0f) // At
+                            vec3(0.0f, 1.0f, -1.0f), // At
+                            0.125f, // aperture
+                            10.0f // focal dist
                      ),
                      "RayTrace_Image_2"),
+            
+            snapshot(camera(25.0f,
+                            aspect,
+                            vec3(-3.5f, 0.0f, 0.0f), // from
+                            vec3(0.0f, 1.0f, -1.0f), // At
+                            0.125f, // aperture
+                            10.0f // focal dist
+                            ),
+                     "RayTrace_Image_3"),
         };
         
         // generate above snapshots of the scene
