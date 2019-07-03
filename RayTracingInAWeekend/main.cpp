@@ -232,14 +232,21 @@ int main(int argc, const char * argv[]) {
         };
         
         // generate above snapshots of the scene
+        fprintf(stderr, "\nTracing into %u x %u images, w %u samples per pixel.",
+                                outImageWidth, outImageHeight, nPixelSamples);
         for (snapshot& snap : snapshots) {
+            fprintf(stderr, "\n\nGenerating scene %s ... ", snap.label.c_str());
             traceInto(col, world, snap.cam);
+            fprintf(stderr, "Done.");
             unsigned char *data = (unsigned char *)col;
+            fprintf(stderr, "\nOutputting image ... ");
             stbi_write_bmp(snap.label.append(outputFormat).c_str(),
                            outImageWidth, outImageHeight,
                            PixelRGBA::getNumComponents(),
                            data);
+            fprintf(stderr, "Done.");
         }
+        fprintf(stderr, "\nAll Done!\n");
     }
     
     return 0;
