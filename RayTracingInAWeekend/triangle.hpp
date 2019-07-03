@@ -18,7 +18,7 @@
 #define CULLING OPTIMIZE_INTERSECT
 #define INTERPOLATE_PARAMETRIC_NORM 1
 
-class triangle : public hitable
+class triangle : public object
 {
 public:
     triangle() = delete;

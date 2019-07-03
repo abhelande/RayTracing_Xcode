@@ -94,7 +94,7 @@ vec3 bgColorAtRay(const ray& r)
 //
 // If it hits nothing - return bg color
 vec3 colorAtRay(const ray& r,
-                hitable_list& world,
+                scene& world,
                 uint32_t bounceDepth)
 {
     intersectParams rec;
@@ -118,7 +118,7 @@ vec3 colorAtRay(const ray& r,
 // Fires 'nPixelSamples' offset randomly per pixel.
 // and applies gamma correction
 void traceInto(PixelRGBA *rgbaTarget,
-               hitable_list& world,
+               scene& world,
                camera& cam)
 {
     // use std uniform random distribution to generate
@@ -179,7 +179,7 @@ int main(int argc, const char * argv[]) {
         std::uniform_real_distribution<float> distr;
         
         // create world
-        hitable_list world;
+        scene world;
         world.objects.emplace_back(new triangle(vec3(-3.0f, 0.0f, -3.0f),
                                                 vec3( 3.0f, 1.0f, -2.0f),
                                                 vec3(-2.0f, 2.0f, -1.5f),

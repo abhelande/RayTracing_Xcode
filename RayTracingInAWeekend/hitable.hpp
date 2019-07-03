@@ -24,7 +24,7 @@ public:
     material *surfaceMat;
 };
 
-class hitable
+class object
 {
 public:
     virtual bool hit(const ray& r,

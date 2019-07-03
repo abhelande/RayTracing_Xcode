@@ -19,7 +19,7 @@
 // so disabling
 #define SHIRLEY_ROOTS 0
 
-class sphere : public hitable
+class sphere : public object
 {
 public:
     sphere() = delete;
