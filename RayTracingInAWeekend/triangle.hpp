@@ -17,7 +17,6 @@
 #define MOLLER_TRUMBORE OPTIMIZE_INTERSECT
 #define CULLING OPTIMIZE_INTERSECT
 #define INTERPOLATE_PARAMETRIC_NORM 1
-constexpr float kEpsilon = 1e-8;
 
 class triangle : public hitable
 {
@@ -32,10 +31,7 @@ public:
                               norm(cross(vtx1 - vtx0, vtx2 - vtx0)),
                               D(dot(norm, vtx0)),
                               surfaceMat(mat)
-    {
-        vec3 un = unit_vector(norm);
-        printf("\nTri Norm: %f, %f, %f", un.x(), un.y(), un.z());
-    }
+    {}
     
     bool hit(const ray& r, float t_min, float t_max, hit_record& rec) const
     {

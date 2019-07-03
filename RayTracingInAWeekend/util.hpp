@@ -11,6 +11,8 @@
 
 #include "vec3.hpp"
 
+constexpr float kEpsilon = 1e-8;
+
 inline float degToRad(float degrees)
 {
     return degrees * (M_PI / 180.0f);

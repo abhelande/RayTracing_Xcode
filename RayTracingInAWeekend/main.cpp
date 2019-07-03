@@ -6,7 +6,6 @@
 //  Copyright © 2018 Abhijit Bhelande. All rights reserved.
 //
 
-//#include <cstdio>
 #include <iostream>
 #include <fstream>
 #include <random>
@@ -169,10 +168,6 @@ int main(int argc, const char * argv[]) {
                                                 vec3( 3.0f, 1.0f, -2.0f),
                                                 vec3(-2.0f, 2.0f, -1.5f),
                                                 new metal(vec3(0.7, 0.1, 0.3))));
-//        world.objects.emplace_back(new triangle(vec3( 6.0f, 1.0f, -1.5f),
-//                                                vec3( -3.0f, 1.0f, -1.0f),
-//                                                vec3( 0.0f, 0.0f, -1.0f),
-//                                                new dielectric(1.0f)));
         world.objects.emplace_back(new sphere(vec3(0.0f, 0.0f, -1.0f),
                                               0.5f,
                                               new metal(vec3(0.1, 0.2, 0.5))));

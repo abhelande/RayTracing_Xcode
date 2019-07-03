@@ -25,28 +25,51 @@ public:
     
     bool hit(const ray& r, float t_min, float t_max, hit_record& rec) const
     {
+        // For sphere whose center is located at C (<Cx, Cy, Cz>) with Radius R (scalar),
+        // Eqn for point P (<Px, Py, Pz>) on the spheres surface,
+        // (Px - Cx)^2 + (Py - Cy)^2 + (Px - Cx)^2 = R^2
+        // i.e. (P - C).(P - C) - R^2 = 0
+        //
+        // Substitute P = Ray eqn = O + t*D
+        // you get quadratic form: a*x^2 + b*x + c = 0
+        // a = |D|^2
+        // b = (O - C).(D)
+        // c = |(O - C)|^2 - R^2
+        //
+        // solving this,
+        // discriminant < 0 => no intersection
+        // otherwise use roots to determine point of intersection
         vec3 oc = r.origin() - center;
         float a = dot(r.direction(), r.direction());
         float b = dot(oc, r.direction());
         float c = dot(oc, oc) - radius * radius;
-
         float discriminant = b * b - a * c;
+        
         if (discriminant > 0) {
             bool didHit = false;
+            float root = 0.0f;
             
-            // check root 1
-            float root = (-b - sqrt(discriminant)) / a;
-            if (root < t_max && root > t_min) {
+            // 0 discriminant
+            if (discriminant < kEpsilon) {
+                root = -b / a * 0.5f;
                 didHit = true;
             } else {
-                // root 2
-                root = (-b + sqrt(discriminant)) / a;
-                didHit = (root < t_max && root > t_min);
+                // check root 1
+                root = (-b - sqrt(discriminant)) / a;
+                if (root < t_max && root > t_min) {
+                    didHit = true;
+                } else {
+                    // root 2
+                    root = (-b + sqrt(discriminant)) / a;
+                    didHit = (root < t_max && root > t_min);
+                }
             }
             
             if (didHit) {
                 rec.t = root;
+                // root is used to find point of intersection
                 rec.p = r.point_at_parameter(root);
+                // normal is simply outwards from center to that point
                 rec.normal = (rec.p - center) / radius;
                 rec.surfaceMat = surfaceMat;
                 
