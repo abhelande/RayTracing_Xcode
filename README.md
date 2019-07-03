@@ -8,6 +8,16 @@ _Based on_:
 * Material from PBRT book (Third ed.)
 <http://www.pbr-book.org/3ed-2018/contents.html>
 
+### Features implemented thus far:
+* basic ray tracing
+* per pixel aliasing
+* sphere intersection (w normal + uv generation)
+* triangle intersection (Moller Trumblore w normal and uv generation)
+* look at camera
+* camera defocus blur (dof)
+* basic lambertian, metal, rough metal, dielectric materials
+* texture lookup (procedural checkerboard)
+
 ## Building and Running
 
 ### Makefile
